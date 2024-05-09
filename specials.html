@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="specials-design.css">
+    <link rel="icon" type="image/jpg" href="NetGainLogo-removedBackground.png">
+    <title>NetGainFantasySports</title>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="props-page.php?page=props">
+                    <img src="NetGainLogo-removedBackground.png" alt="NetGain Logo" width="50" height="50">
+                    <!--Green color code: #00BF63-->
+                  </a>
+            </div>
+            <div class="navbar-items">
+                <a href="props-page.php?page=props">Home</a>
+                <a href="props-page.php?page=specials" class="active">Specials</a>
+                <a href="props-page.php?page=nfl">NFL</a>
+                <a href="props-page.php?page=nba">NBA</a>
+                <a href="props-page.php?page=nhl">NHL</a>
+                <a href="props-page.php?page=mlb">MLB</a>
+                <a href="props-page.php?page=cbb">CBB</a>
+                <a href="props-page.php?page=cfb">CFB</a>
+                <a href="props-page.php?page=soccer">Soccer</a>
+            </div>
+            <div class="user-info">
+                <span class="balance">Balance: $<!--Balance--></span>
+                <div class="user-menu"> 
+                    <a href="props-page.php?page=account">Account <i class="fa fa-user"></i></a> 
+                </div>
+            </div>
+            
+        </nav>
+    </header>
+
+    <main class="flex-container">
+        <center><h1>Specials</h1></center>
+    <div class="content-container">
+      <div class="prop-cards-container">
+
+
+        <div class="prop-card" id="prop-card12.1" data-type="straight" onclick="toggleSelection(this)">
+            <div class="player-headshots-container">
+                <img src="nbaTeams/LALakers.png" class="player-headshot">
+                
+            </div>
+          <div class="player-name">Lakers</div>
+          <div class="vs-team">2/14 @8:00 vs UTA</div>
+          <div class="prop-line"></div>
+          <div class="points">Spread +6</div>
+        </div>
+
+        <div class="prop-card" id="prop-card12.1" data-type="straight" onclick="toggleSelection(this)">
+            <div class="player-headshots-container">
+                <img src="nbaTeams/UtahJazz.jpg" class="player-headshot">
+                
+            </div>
+          <div class="player-name">Jazz</div>
+          <div class="vs-team">2/14 @8:00 vs LAL</div>
+          <div class="prop-line"></div>
+          <div class="points">Spread -6.0</div>
+        </div>
+        
+
+
+      </div>
+
+
+      <div id="selectedPropsContainer" class="selected-props-container">
+        <button id="clearPropsButton" onclick="clearSelectedProps()">Clear</button>
+        <h2>Selected Props</h2>
+        <div id="selectedPropsList" class="selected-props-list">
+            <!-- Selected props will be listed here -->
+        </div>
+        <div class="bet-details">
+            <label for="riskAmount">Risk Amount:</label>
+            <input type="number" id="riskAmount" min="5" max="200" oninput="calculatePayout()">
+        </div>
+        <div id="errorDisplay" style="color: red;"></div>
+        <div id="payoutAmount">Payout: $0</div>
+        <button id="submitBetButton" onclick="submitBet()">Place Entry</button>
+    </div>
+
+
+       </div> 
+    </main>
+
+    <footer>
+        <p>&copy; 2023 NetGain Fantasy Sports. All rights reserved.</p>
+    </footer>
+    <script>
+       // for clicking player props
+       function toggleSelection(element) {
+      element.classList.toggle('selected');
+      }
+
+      // creates the prop builder on right side of the screen
+
+      var selectedProps = [];
+
+      document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.prop-card').forEach(card => {
+        card.addEventListener('click', function () {
+
+            // Check if the maximum number of props is already selected
+            if (selectedProps.length >= 7 && !this.classList.contains('selected')) {
+                alert('Maximum number of props (7) already selected.');
+                return; // Prevent adding more props
+            }
+
+            var propDetails = getPropDetails(this);
+            var index = selectedProps.findIndex(prop => prop.id === propDetails.id);
+            
+            if (index > -1) {
+                selectedProps.splice(index, 1);
+            } else {
+                var propDetails = getPropDetails(this);
+                selectedProps.push(propDetails);
+               
+            }
+            updateSelectedPropsList();
+        });
+    });
+});
+
+
+
+function getPropDetails(card) {
+    var name = card.querySelector('.player-name').innerText;
+    var teams = name.split(/ @ | vs /); // Split by ' @ ' or ' vs '
+
+    
+    
+
+    return {
+        id: card.id,
+        teams: teams, // This will be an array [Team1, Team2]
+        matchup: card.querySelector('.vs-team').innerText,
+        prop: card.querySelector('.points').innerText,
+        type: card.getAttribute('data-type')
+        
+    };
+}
+
+
+function updateSelectedPropsList() {
+    var list = document.getElementById('selectedPropsList');
+    var errorDisplay = document.getElementById('errorDisplay');
+    var riskInput = document.getElementById('riskAmount');
+    list.innerHTML = '';
+    
+    selectedProps.forEach((prop, index) => {
+        var div = document.createElement('div');
+        div.className = 'prop-item';
+        div.id = 'prop-item-' + index;
+        var innerHTML = `<span>${prop.teams.join(' vs ')} - ${prop.matchup} - ${prop.prop}</span>`;
+        
+        if (prop.type === 'overunder') {
+            innerHTML += `
+                <div class="over-under-buttons">
+                    <button class="over-under-button over ${prop.overUnder === 'over' ? 'selected' : ''}" onclick="setOverUnder(${index}, 'over')">Over</button>
+                    <button class="over-under-button under ${prop.overUnder === 'under' ? 'selected' : ''}" onclick="setOverUnder(${index}, 'under')">Under</button>
+                </div>`;
+        } else if (prop.type === 'moneyline') {
+            innerHTML += `
+                <div class="team-choice-buttons">
+                    <button class="team-choice-button ${prop.teamChoice === prop.teams[0] ? 'selected' : ''}" onclick="setTeamChoice(${index}, '${prop.teams[0]}')">${prop.teams[0]}</button>
+                    <button class="team-choice-button ${prop.teamChoice === prop.teams[1] ? 'selected' : ''}" onclick="setTeamChoice(${index}, '${prop.teams[1]}')">${prop.teams[1]}</button>
+                </div>`;
+        } else if (prop.type === 'straight') {
+            innerHTML += `
+                <div class="team-choice-buttons">
+                    <button class="team-choice-button ${prop.teamChoice === prop.teams[0] ? 'selected' : ''}" onclick="setTeamChoice(${index}, '${prop.teams[0]}')">${prop.teams[0]}</button>
+                </div>`;
+        }
+        
+        innerHTML += `<button class="delete-button" onclick="removeProp(${index})">X</button>`;
+        div.innerHTML = innerHTML;
+        list.appendChild(div);
+    });
+
+    // Check the number of selected props and show/hide error message
+    if (selectedProps.length < 2) {
+        if (errorDisplay) errorDisplay.innerText = 'Complete your entry when 2+ props are selected.';
+    } else {
+        if (errorDisplay) errorDisplay.innerText = '';
+    }
+}
+
+
+
+function removeProp(index) {
+    var propToRemove = selectedProps[index];
+    selectedProps.splice(index, 1);
+    updateSelectedPropsList(); // Update the list after removing the item
+
+    // Remove 'selected' class from the corresponding card in the main container
+    var allPropCards = document.querySelectorAll('.prop-card');
+    allPropCards.forEach(card => {
+        if (card.id === propToRemove.id) {
+            card.classList.remove('selected');
+        }
+    });
+}
+
+function clearSelectedProps() {
+    selectedProps = []; // Clear the array
+    updateSelectedPropsList(); // Update the UI
+
+    // Iterate over all prop-card elements and remove the 'selected' class
+    var allPropCards = document.querySelectorAll('.prop-card');
+    allPropCards.forEach(card => {
+        card.classList.remove('selected');
+    });
+
+    // Clear the risk amount input
+    var riskInput = document.getElementById('riskAmount');
+    if (riskInput) {
+        riskInput.value = '';
+    }
+
+    // Recalculate payout to reflect the cleared risk amount
+    calculatePayout();
+}
+
+function setOverUnder(index, choice) {
+    selectedProps[index].overUnder = choice;
+    updateSelectedPropsList();
+    // Update button styles to reflect selection
+    var propItem = document.getElementById('prop-item-' + index);
+    var buttons = propItem.getElementsByClassName('over-under-button');
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].classList.remove('selected');
+    }
+    propItem.querySelector('.' + choice).classList.add('selected');
+}
+
+function setTeamChoice(index, selection) {
+    selectedProps[index].teamChoice = selection;
+    
+    updateSelectedPropsList();
+    // Update button styles to reflect selection
+    var propItem = document.getElementById('prop-item-' + index);
+    var buttons = propItem.getElementsByClassName('team-choice-button');
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].classList.remove('selected');
+    }
+    Array.from(buttons).find(btn => btn.textContent === selection).classList.add('selected');
+}
+
+
+
+// calculates the payout of the slip
+function calculatePayout() {
+    var riskInput = document.getElementById('riskAmount');
+    var risk = parseInt(riskInput.value, 10);
+    var payoutDisplay = document.getElementById('payoutAmount');
+    var errorDisplay = document.getElementById('errorDisplay');
+
+    // Reset error display
+    if (errorDisplay) errorDisplay.innerText = '';
+
+    // Validate risk amount and number of selected props
+    if (riskInput.value.length > 0 && !isNaN(risk) && risk >= 5 && risk <= 35 && selectedProps.length >= 2) {
+        var multiplier = [0, 0, 3, 5, 10, 15, 25, 40][selectedProps.length];
+        var payout = risk * multiplier;
+        payoutDisplay.innerText = 'Payout: $' + payout;
+    } else {
+        payoutDisplay.innerText = 'Payout: $0';
+        if (riskInput.value.length > 0 && (isNaN(risk) || risk < 5 || risk > 35)) {
+            errorDisplay.innerText = 'Risk must be between $5 and $35.';
+        } else if (selectedProps.length < 2) {
+            errorDisplay.innerText = 'You can complete your entry when 2+ props are selected.';
+        }
+    }
+}
+
+// Call calculatePayout on page load
+document.addEventListener('DOMContentLoaded', function() {
+    calculatePayout();
+});
+
+
+  // for submitting the user's bet
+  function submitBet() {
+
+    
+
+    var errorDisplay = document.getElementById('errorDisplay');
+    var riskInput = document.getElementById('riskAmount');
+    var risk = parseInt(riskInput.value, 10);
+
+    // Reset error display
+    if (errorDisplay) errorDisplay.innerText = '';
+
+    // Check if the risk amount is valid
+    if (isNaN(risk) || risk < 5 || risk > 35) {
+        errorDisplay.innerText = 'Risk must be between $5 and $35.';
+        return;
+    }
+
+    // Check if at least two picks are selected
+    if (selectedProps.length < 2) {
+        errorDisplay.innerText = 'You must select at least 2 props.';
+        return;
+    }
+
+     // Check if over/under or team choice is selected for each pick
+     for (let prop of selectedProps) {
+    if (prop.type === 'overunder' && !prop.overUnder) {
+        errorDisplay.innerText = 'You must choose over or under for each selection.';
+        return;
+    } else if (prop.type === 'moneyline' && !prop.teamChoice) {
+        errorDisplay.innerText = 'You must choose a team for each moneyline selection.';
+        return;
+    } else if (prop.type === 'straight' && !prop.teamChoice) { // Update this line
+        errorDisplay.innerText = 'You must select the straight bet.';
+        return;
+    }
+}
+
+
+    // Date object for the current time
+    let createdAt = new Date().toISOString().slice(0,19).replace('T',' ');
+
+    // Prepare the data object to send
+
+    let data = {
+      riskAmount: document.getElementById('riskAmount').value,
+      picks: JSON.stringify(selectedProps),
+      createdAt: createdAt
+    };
+
+    // If all validations pass, proceed to store the data
+    storeBetData();
+}
+
+
+
+// for storing bet data
+function storeBetData() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "storeBetData.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    xhr.onreadystatechange = function() {
+        if (this.readyState === XMLHttpRequest.DONE) {
+            if (this.status === 200) {
+                // Handle success
+                alert(this.responseText); // Or update the UI appropriately
+            
+                // Clear the selected props if bet placed successfully
+                if (this.responseText.includes("Bet Placed Successfully")) {
+                    clearSelectedProps();
+                }
+
+            } else {
+                // Handle error
+                alert("An error occurred: " + this.responseText);
+            }
+        }
+    };
+
+    var data = "riskAmount=" + encodeURIComponent(document.getElementById('riskAmount').value) +
+               "&picks=" + encodeURIComponent(JSON.stringify(selectedProps));
+
+    xhr.send(data);
+}
+
+
+
+
+
+
+
+
+    </script>
+</body>
+</html>

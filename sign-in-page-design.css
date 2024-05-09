@@ -1,0 +1,80 @@
+body {
+  font-family: 'Bebas Neue', sans-serif;
+  background-color: #f2f2f2;
+  margin: 0;
+  padding: 0;
+  /*display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;*/
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 70vh;
+}
+
+
+.logo-sign-in-page{
+  text-align: center;
+  margin-bottom: -70px;
+}
+
+.login-section {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 300px;
+  width: 100%;
+}
+
+.login-section form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-section input {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.login-section #submit-input {
+  background-color: #00BF63;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 21px;
+  font-family: 'Bebas Neue', sans-serif;
+}
+
+.login-section button:hover {
+  background-color: #005f30;
+}
+
+.login-section input:focus, .login-section button:focus {
+  outline: none;
+  border-color: #00BF63;
+}
+
+.login-section input::placeholder {
+  color: #999;
+}
+
+#submit-input:hover{
+  background-color: #005f30;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-bottom: 15px;
+}

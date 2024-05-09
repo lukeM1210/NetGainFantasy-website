@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="props-page-design.css">
+    <link rel="icon" type="image/jpg" href="NetGainLogo-removedBackground.png">
+    <title>NetGainFantasySports</title>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="props-page.php?page=props">
+                    <img src="NetGainLogo-removedBackground.png" alt="NetGain Logo" width="50" height="50">
+                    <!--Green color code: #00BF63-->
+                  </a>
+            </div>
+            <div class="navbar-items">
+                <a href="props-page.php?page=props" class="active">Home</a>
+                <a href="props-page.php?page=specials">Specials</a>
+                <a href="props-page.php?page=nfl">NFL</a>
+                <a href="props-page.php?page=nba">NBA</a>
+                <a href="props-page.php?page=nhl">NHL</a>
+                <a href="props-page.php?page=mlb">MLB</a>
+                <a href="props-page.php?page=cbb">CBB</a>
+                <a href="props-page.php?page=cfb">CFB</a>
+                <a href="props-page.php?page=soccer">Soccer</a>
+            </div>
+            <div class="user-info">
+                <span class="balance">Balance: $<!--Balance--></span>
+                <div class="user-menu"> 
+                    <a href="props-page.php?page=account">Account <i class="fa fa-user"></i></a> 
+                </div>
+            </div>
+            
+        </nav>
+    </header>
+
+    <main class="flex-container">
+        <section class="welcome-section">
+            <h1>Welcome to NetGain Fantasy Sports!</h1>
+            <p>This website is still undergoing development. If you would like to leave suggestions for the user interface or you experience any difficulties or bugs
+                please email <a href="mailto:netgainfantasysports@gmail.com">netgainfantasysports@gmail.com</a>
+                <a href="terms&conditions.html">Terms & Conditions</a>
+
+            </p>
+
+            <h1>Payout Details:</h1>
+            <p>2 Legs: 3x</p>
+            <p>3 Legs: 5x</p>
+            <p>4 Legs: 10x</p>
+            <p>5 Legs: 15x</p>
+            <p>6 Legs: 25x</p>
+            <p>7 Legs: 40x</p>
+
+            <h1>NetGain's Game Of The Day</h1>
+            <p>Select who you think will win</p>
+            <p>Select 7/7 correct for the week and earn $50 in credit</p>
+            <img src="GOD/GOTD1.png" height="550" width="550">
+            
+            <div class="team-selection">
+                <button id="select1" onclick="selectTeam('select1')">Canucks</button>
+                <button id="select2" onclick="selectTeam('select2')">Red Wings</button>
+            </div>
+        
+            <button id="submitSelection" style="display: none;" onclick="submitSelection()">Submit</button>
+        
+        </section>
+
+        <!-- Other content goes here -->
+    </main>
+
+    <footer>
+        <p>&copy; 2023 NetGain Fantasy Sports. All rights reserved.</p>
+    </footer>
+
+    <!-- For selecting game of the day pick -->
+    <script>
+        let selectedTeam = '';
+    
+        function selectTeam(teamId) {
+    // Check if the team is already selected
+    if (selectedTeam === teamId) {
+        // If already selected, unselect it
+        selectedTeam = '';
+        document.getElementById(teamId).classList.remove('selected');
+        document.getElementById('submitSelection').style.display = 'none'; // Hide the submit button
+    } else {
+        // If not selected, select it
+        selectedTeam = teamId;
+        document.getElementById('submitSelection').style.display = 'block'; // Show the submit button
+        document.getElementById('select1').classList.remove('selected');
+        document.getElementById('select2').classList.remove('selected');
+        document.getElementById(teamId).classList.add('selected');
+    }
+}
+    
+        function submitSelection() {
+            if (selectedTeam === '') {
+                alert('Please select a team first.');
+                return;
+            }
+    
+            // Example of submitting data using XMLHttpRequest
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "submitGOD.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    
+            xhr.onreadystatechange = function() {
+                if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                    alert("Selection submitted successfully!");
+                    // Handle the response here
+
+                    // Clear selected team and hide submit button after successful submission
+            selectedTeam = '';
+            document.getElementById('submitSelection').style.display = 'none';
+            document.getElementById('select1').classList.remove('selected');
+            document.getElementById('select2').classList.remove('selected');
+                }
+            };
+    
+            var today = new Date().toISOString().slice(0, 10); // Current date in YYYY-MM-DD format
+            var username = "user"; // Replace with actual username, maybe from session
+            var data = "username=" + encodeURIComponent(username) +
+                       "&date=" + encodeURIComponent(today) +
+                       "&selection=" + encodeURIComponent(selectedTeam);
+    
+            xhr.send(data);
+        }
+    </script>
+    
+
+</body>
+</html>
